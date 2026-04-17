@@ -1,4 +1,3 @@
-"""ECIMS — Suppliers Routes"""
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from backend.extensions import db
@@ -18,8 +17,6 @@ def list_suppliers():
 @jwt_required()
 def create_supplier():
     data = request.get_json()
-    if not data.get("name"):
-        return err("name required")
     s = Supplier(name=data["name"], contact=data.get("contact"))
     db.session.add(s)
     db.session.commit()

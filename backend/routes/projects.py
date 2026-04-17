@@ -1,4 +1,3 @@
-"""ECIMS — Projects Routes"""
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from backend.extensions import db
@@ -11,20 +10,16 @@ projects_bp = Blueprint("projects", __name__)
 @projects_bp.route("", methods=["GET"])
 @jwt_required()
 def list_projects():
-    projects = Project.query.filter_by(active=True).order_by(Project.name).all()
-    return ok([p.to_dict() for p in projects])
+    return ok([p.to_dict() for p in Project.query.filter_by(active=True).order_by(Project.name).all()])
 
 
 @projects_bp.route("", methods=["POST"])
 @jwt_required()
 def create_project():
     data = request.get_json()
-    if not data.get("name"):
-        return err("name required")
     p = Project(name=data["name"], description=data.get("description"))
     db.session.add(p)
     db.session.commit()
-    log_action("CREATE_PROJECT", f"{p.name}")
     return ok(p.to_dict(), status=201)
 
 

@@ -1,4 +1,3 @@
-"""ECIMS — Audit Logs Routes (read-only for managers, immutable)"""
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from backend.models import AuditLog
@@ -12,19 +11,10 @@ logs_bp = Blueprint("logs", __name__)
 def list_logs():
     page = int(request.args.get("page", 1))
     per_page = int(request.args.get("per_page", 50))
-    action = request.args.get("action", "").strip()
-
+    action = request.args.get("action", "")
     query = AuditLog.query
     if action:
         query = query.filter(AuditLog.action.ilike(f"%{action}%"))
-
     total = query.count()
-    logs = query.order_by(AuditLog.timestamp.desc()) \
-                .offset((page - 1) * per_page).limit(per_page).all()
-
-    return ok({
-        "logs": [l.to_dict() for l in logs],
-        "total": total,
-        "page": page,
-        "per_page": per_page
-    })
+    logs = query.order_by(AuditLog.timestamp.desc()).offset((page - 1) * per_page).limit(per_page).all()
+    return ok({"logs": [l.to_dict() for l in logs], "total": total, "page": page})
