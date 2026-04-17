@@ -56,7 +56,9 @@ def change_password():
     user = User.query.get(user_id)
     if not bcrypt.checkpw(data["current_password"].encode(), user.password_hash.encode()):
         return err("Current password incorrect", 401)
-    user.password_hash = bcrypt.hashpw(data["new_password"].encode(), bcrypt.gensalt()).decode()
+    user.password_hash = bcrypt.hashpw(
+        data["new_password"].encode(), bcrypt.gensalt()
+    ).decode()
     db.session.commit()
     return ok(message="Password updated")
 
@@ -74,9 +76,14 @@ def create_user():
     if User.query.filter_by(username=data["username"]).first():
         return err("Username already exists")
     hashed = bcrypt.hashpw(data["password"].encode(), bcrypt.gensalt()).decode()
-    user = User(username=data["username"], password_hash=hashed, role=data.get("role", "manager"))
+    user = User(
+        username=data["username"],
+        password_hash=hashed,
+        role=data.get("role", "manager")
+    )
     db.session.add(user)
     db.session.commit()
+    log_action("CREATE_USER", f"Created: {user.username}")
     return ok(user.to_dict(), status=201)
 
 
@@ -85,15 +92,23 @@ def create_user():
 def reset_password(uid):
     data = request.get_json()
     user = User.query.get_or_404(uid)
-    user.password_hash = bcrypt.hashpw(data.get("new_password", "Welcome@123").encode(), bcrypt.gensalt()).decode()
+    user.password_hash = bcrypt.hashpw(
+        data.get("new_password", "Welcome@123").encode(), bcrypt.gensalt()
+    ).decode()
     db.session.commit()
+    log_action("RESET_PASSWORD", f"Reset password for: {user.username}")
     return ok(message=f"Password reset for {user.username}")
 
 
 @auth_bp.route("/users/<int:uid>", methods=["DELETE"])
 @admin_required
 def delete_user(uid):
+    identity = int(get_jwt_identity())
+    if uid == identity:
+        return err("Cannot delete your own account")
     user = User.query.get_or_404(uid)
+    username = user.username
     db.session.delete(user)
     db.session.commit()
+    log_action("DELETE_USER", f"Deleted: {username}")
     return ok(message="User deleted")

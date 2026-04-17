@@ -65,7 +65,8 @@ def create_sku():
 def update_sku(sku_id):
     sku = SKU.query.get_or_404(sku_id)
     data = request.get_json()
-    for f in ["lcsc_part_number", "part_name", "ref_name", "category", "package", "supplier_id", "min_qty", "remarks"]:
+    for f in ["lcsc_part_number", "part_name", "ref_name", "category",
+              "package", "supplier_id", "min_qty", "remarks"]:
         if f in data:
             setattr(sku, f, data[f])
     db.session.commit()

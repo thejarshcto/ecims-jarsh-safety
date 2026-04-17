@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend.extensions import db
 from backend.models import Employee
 from backend.helpers import log_action, ok, err
@@ -19,7 +19,11 @@ def create_employee():
     data = request.get_json()
     if Employee.query.filter_by(employee_id=data["employee_id"]).first():
         return err("Employee ID already exists")
-    emp = Employee(employee_id=data["employee_id"], name=data["name"], department=data.get("department"))
+    emp = Employee(
+        employee_id=data["employee_id"],
+        name=data["name"],
+        department=data.get("department")
+    )
     db.session.add(emp)
     db.session.commit()
     log_action("CREATE_EMPLOYEE", f"{emp.name}")

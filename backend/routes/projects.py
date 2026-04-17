@@ -20,6 +20,7 @@ def create_project():
     p = Project(name=data["name"], description=data.get("description"))
     db.session.add(p)
     db.session.commit()
+    log_action("CREATE_PROJECT", f"{p.name}")
     return ok(p.to_dict(), status=201)
 
 

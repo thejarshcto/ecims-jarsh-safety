@@ -10,7 +10,7 @@ allocations_bp = Blueprint("allocations", __name__)
 @allocations_bp.route("", methods=["POST"])
 @jwt_required()
 def allocate():
-    identity = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
     entry = StockEntry.query.filter_by(uid=data.get("uid")).first()
     if not entry:
@@ -24,7 +24,7 @@ def allocate():
         uid=data["uid"], sku_id=data["sku_id"], employee_id=data["employee_id"],
         project_id=data.get("project_id"), qty=qty,
         returnable=bool(data.get("returnable", False)),
-        remarks=data.get("remarks"), created_by=identity["id"]
+        remarks=data.get("remarks"), created_by=user_id
     )
     entry.qty_available -= qty
     db.session.add(allocation)
@@ -49,7 +49,7 @@ def list_allocations():
 @allocations_bp.route("/<int:alloc_id>/return", methods=["POST"])
 @jwt_required()
 def process_return(alloc_id):
-    identity = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
     allocation = Allocation.query.get_or_404(alloc_id)
     qty_returned = int(data.get("qty_returned", 0))
@@ -57,8 +57,10 @@ def process_return(alloc_id):
     outstanding = allocation.qty - already_returned
     if qty_returned > outstanding:
         return err(f"Cannot return more than outstanding ({outstanding})")
-    ret = Return(allocation_id=alloc_id, qty_returned=qty_returned,
-                 remarks=data.get("remarks"), created_by=identity["id"])
+    ret = Return(
+        allocation_id=alloc_id, qty_returned=qty_returned,
+        remarks=data.get("remarks"), created_by=user_id
+    )
     entry = StockEntry.query.filter_by(uid=allocation.uid).first()
     if entry:
         entry.qty_available += qty_returned

@@ -10,7 +10,7 @@ stock_bp = Blueprint("stock", __name__)
 @stock_bp.route("", methods=["POST"])
 @jwt_required()
 def add_stock():
-    identity = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
     sku = SKU.query.get(data.get("sku_id"))
     if not sku:
@@ -20,7 +20,7 @@ def add_stock():
         sku_id=data["sku_id"], uid=uid, packet_no=data.get("packet_no"),
         qty_added=int(data["qty_added"]), qty_available=int(data["qty_added"]),
         unit_price=float(data["unit_price"]), supplier_id=data.get("supplier_id"),
-        purchase_date=data.get("purchase_date"), created_by=identity["id"]
+        purchase_date=data.get("purchase_date"), created_by=user_id
     )
     db.session.add(entry)
     db.session.commit()
@@ -41,5 +41,8 @@ def list_stock():
 @stock_bp.route("/uids-for-sku/<int:sku_id>", methods=["GET"])
 @jwt_required()
 def uids_for_sku(sku_id):
-    entries = StockEntry.query.filter(StockEntry.sku_id == sku_id, StockEntry.qty_available > 0).all()
+    entries = StockEntry.query.filter(
+        StockEntry.sku_id == sku_id,
+        StockEntry.qty_available > 0
+    ).all()
     return ok([{"uid": e.uid, "qty_available": e.qty_available} for e in entries])
