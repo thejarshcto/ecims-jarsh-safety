@@ -1,0 +1,26 @@
+"""ECIMS — Suppliers Routes"""
+from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
+from extensions import db
+from models import Supplier
+from helpers import ok, err
+
+suppliers_bp = Blueprint("suppliers", __name__)
+
+
+@suppliers_bp.route("", methods=["GET"])
+@jwt_required()
+def list_suppliers():
+    return ok([s.to_dict() for s in Supplier.query.order_by(Supplier.name).all()])
+
+
+@suppliers_bp.route("", methods=["POST"])
+@jwt_required()
+def create_supplier():
+    data = request.get_json()
+    if not data.get("name"):
+        return err("name required")
+    s = Supplier(name=data["name"], contact=data.get("contact"))
+    db.session.add(s)
+    db.session.commit()
+    return ok(s.to_dict(), status=201)
