@@ -1,25 +1,22 @@
 """
 Configuration for Jarsh Safety ECIMS
-Railway deployment version — reads from environment variables
+Render deployment — PostgreSQL
 """
 import os
 
 
 class Config:
     # ── Database ──────────────────────────────────────────────
-    # Railway provides DATABASE_URL automatically when you add MySQL plugin
+    # Render provides DATABASE_URL automatically
     DATABASE_URL = os.getenv("DATABASE_URL", "")
 
-    # If DATABASE_URL is set (Railway), use it directly
-    # Otherwise fall back to individual vars (local dev)
     if DATABASE_URL:
+        # Render gives postgres:// but SQLAlchemy needs postgresql://
+        if DATABASE_URL.startswith("postgres://"):
+            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
         SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
-        MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
-        MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
-        MYSQL_USER = os.getenv("MYSQL_USER", "root")
-        MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "Jarsh@23895")
-        MYSQL_DB = os.getenv("MYSQL_DB", "ecims")
+        # Local development fallback — uses your local MySQL
         SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://root:Jarsh%4023895@localhost:3306/ecims"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False

@@ -1,5 +1,5 @@
 """
-ECIMS — SQLAlchemy Models
+ECIMS — SQLAlchemy Models (PostgreSQL compatible)
 """
 from datetime import datetime
 from extensions import db
@@ -10,7 +10,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.Enum("admin", "manager"), nullable=False, default="manager")
+    role = db.Column(db.String(20), nullable=False, default="manager")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -63,10 +63,7 @@ class SKU(db.Model):
     lcsc_part_number = db.Column(db.String(100))
     part_name = db.Column(db.String(200), nullable=False)
     ref_name = db.Column(db.String(100))
-    category = db.Column(db.Enum(
-        "Resistor", "Capacitor", "IC", "Inductor", "Diode",
-        "Transistor", "Connector", "LED", "Crystal", "Other"
-    ), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
     package = db.Column(db.String(50))
     supplier_id = db.Column(db.Integer, db.ForeignKey("suppliers.id"))
     min_qty = db.Column(db.Integer, default=10)

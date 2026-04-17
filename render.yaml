@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: ecims-jarsh-safety
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: JWT_SECRET_KEY
+        value: jarsh-ecims-jwt-secret-2026
+      - key: SECRET_KEY
+        value: jarsh-ecims-app-secret-2026
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecims-db
+          property: connectionString
+
+databases:
+  - name: ecims-db
+    databaseName: ecims
+    user: ecims_user
+    plan: free

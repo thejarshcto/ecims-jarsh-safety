@@ -1,16 +1,14 @@
 /* ECIMS — API Client
-   Auto-detects local vs production Railway deployment
+   Auto-detects local vs Render production deployment
 */
 
-// If running locally (file:// or localhost), use local backend
-// Otherwise use the Railway backend URL
 const isLocal = window.location.hostname === "localhost" ||
                 window.location.hostname === "127.0.0.1" ||
                 window.location.protocol === "file:";
 
 const BASE = isLocal
   ? "http://localhost:5000/api"
-  : "https://REPLACE_WITH_YOUR_RAILWAY_URL/api";
+  : "https://ecims-jarsh-safety.onrender.com/api";
 
 let authToken = localStorage.getItem("ecims_token") || null;
 

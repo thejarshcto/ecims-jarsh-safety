@@ -1,6 +1,6 @@
 """
 Jarsh Safety — ECIMS Backend
-Flask Application Entry Point — Railway Deployment
+Flask Application — Render + PostgreSQL Deployment
 """
 
 from flask import Flask
@@ -16,13 +16,13 @@ from routes.projects import projects_bp
 from routes.suppliers import suppliers_bp
 from routes.reports import reports_bp
 from routes.logs import logs_bp
+import bcrypt
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Allow all origins for Railway deployment
     CORS(app, origins="*")
 
     db.init_app(app)
@@ -39,11 +39,35 @@ def create_app():
     app.register_blueprint(reports_bp, url_prefix="/api/reports")
     app.register_blueprint(logs_bp, url_prefix="/api/logs")
 
+    # Auto-create all tables and seed default data
+    with app.app_context():
+        db.create_all()
+        seed_default_data()
+
     @app.route("/api/health")
     def health():
         return {"status": "ok", "system": "Jarsh Safety ECIMS"}
 
     return app
+
+
+def seed_default_data():
+    """Insert default admin user and suppliers if not present"""
+    from models import User, Supplier
+
+    # Create admin user
+    if not User.query.filter_by(username="admin").first():
+        hashed = bcrypt.hashpw(b"admin123", bcrypt.gensalt()).decode()
+        admin = User(username="admin", password_hash=hashed, role="admin")
+        db.session.add(admin)
+
+    # Create default suppliers
+    default_suppliers = ["LCSC", "Mouser", "DigiKey", "Local"]
+    for name in default_suppliers:
+        if not Supplier.query.filter_by(name=name).first():
+            db.session.add(Supplier(name=name))
+
+    db.session.commit()
 
 
 app = create_app()
