@@ -1,12 +1,13 @@
 """
-ECIMS — SQLAlchemy Models (PostgreSQL compatible)
+ECIMS - SQLAlchemy Models (PostgreSQL compatible)
 """
 from datetime import datetime
-from backend.extensions import db
+from extensions import db
 
 
 class User(db.Model):
     __tablename__ = "users"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
@@ -19,6 +20,7 @@ class User(db.Model):
 
 class Supplier(db.Model):
     __tablename__ = "suppliers"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=True, nullable=False)
     contact = db.Column(db.String(200))
@@ -30,6 +32,7 @@ class Supplier(db.Model):
 
 class Employee(db.Model):
     __tablename__ = "employees"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     employee_id = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(200), nullable=False)
@@ -47,6 +50,7 @@ class Employee(db.Model):
 
 class Project(db.Model):
     __tablename__ = "projects"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
@@ -59,6 +63,7 @@ class Project(db.Model):
 
 class SKU(db.Model):
     __tablename__ = "sku_master"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     lcsc_part_number = db.Column(db.String(100))
     part_name = db.Column(db.String(200), nullable=False)
@@ -85,6 +90,7 @@ class SKU(db.Model):
 
 class StockEntry(db.Model):
     __tablename__ = "stock_entries"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     sku_id = db.Column(db.Integer, db.ForeignKey("sku_master.id"), nullable=False)
     uid = db.Column(db.String(50), unique=True, nullable=False)
@@ -115,6 +121,7 @@ class StockEntry(db.Model):
 
 class Allocation(db.Model):
     __tablename__ = "allocations"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.String(50), db.ForeignKey("stock_entries.uid"), nullable=False)
     sku_id = db.Column(db.Integer, db.ForeignKey("sku_master.id"), nullable=False)
@@ -149,6 +156,7 @@ class Allocation(db.Model):
 
 class Return(db.Model):
     __tablename__ = "returns"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     allocation_id = db.Column(db.Integer, db.ForeignKey("allocations.id"), nullable=False)
     qty_returned = db.Column(db.Integer, nullable=False)
@@ -168,6 +176,7 @@ class Return(db.Model):
 
 class AuditLog(db.Model):
     __tablename__ = "audit_logs"
+    __table_args__ = {"extend_existing": True}
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     username = db.Column(db.String(100))
