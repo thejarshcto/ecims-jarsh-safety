@@ -1,5 +1,7 @@
 from flask import Blueprint, request
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token, jwt_required, get_jwt_identity, get_jwt
+)
 from functools import wraps
 import bcrypt
 from backend.extensions import db
@@ -13,7 +15,8 @@ def admin_required(fn):
     @wraps(fn)
     @jwt_required()
     def wrapper(*args, **kwargs):
-        if get_jwt_identity().get("role") != "admin":
+        claims = get_jwt()
+        if claims.get("role") != "admin":
             return err("Admin access required", 403)
         return fn(*args, **kwargs)
     return wrapper
@@ -29,7 +32,10 @@ def login():
         return err("Invalid credentials", 401)
     if not bcrypt.checkpw(data["password"].encode(), user.password_hash.encode()):
         return err("Invalid credentials", 401)
-    token = create_access_token(identity={"id": user.id, "username": user.username, "role": user.role})
+    token = create_access_token(
+        identity=str(user.id),
+        additional_claims={"username": user.username, "role": user.role}
+    )
     log_action("LOGIN", f"User {user.username} logged in")
     return ok({"token": token, "user": user.to_dict()})
 
@@ -37,17 +43,17 @@ def login():
 @auth_bp.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
-    identity = get_jwt_identity()
-    log_action("LOGOUT", f"User {identity.get('username')} logged out")
+    claims = get_jwt()
+    log_action("LOGOUT", f"User {claims.get('username')} logged out")
     return ok(message="Logged out")
 
 
 @auth_bp.route("/change-password", methods=["POST"])
 @jwt_required()
 def change_password():
-    identity = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
-    user = User.query.get(identity["id"])
+    user = User.query.get(user_id)
     if not bcrypt.checkpw(data["current_password"].encode(), user.password_hash.encode()):
         return err("Current password incorrect", 401)
     user.password_hash = bcrypt.hashpw(data["new_password"].encode(), bcrypt.gensalt()).decode()
