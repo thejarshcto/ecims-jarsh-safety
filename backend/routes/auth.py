@@ -6,14 +6,12 @@ POST /api/auth/change-password
 GET/POST/DELETE /api/auth/users  (admin only)
 """
 from flask import Blueprint, request
-from flask_jwt_extended import (
-    create_access_token, jwt_required, get_jwt_identity
-)
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from functools import wraps
 import bcrypt
-from extensions import db
-from models import User
-from helpers import log_action, ok, err
+from backend.extensions import db
+from backend.models import User
+from backend.helpers import log_action, ok, err
 
 auth_bp = Blueprint("auth", __name__)
 

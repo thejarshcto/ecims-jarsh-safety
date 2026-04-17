@@ -1,9 +1,9 @@
 """ECIMS — Suppliers Routes"""
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from extensions import db
-from models import Supplier
-from helpers import ok, err
+from backend.extensions import db
+from backend.models import Supplier
+from backend.helpers import ok, err
 
 suppliers_bp = Blueprint("suppliers", __name__)
 

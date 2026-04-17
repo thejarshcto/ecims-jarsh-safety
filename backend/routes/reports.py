@@ -7,9 +7,9 @@ GET /api/reports/employee
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from sqlalchemy import func, extract
-from extensions import db
-from models import StockEntry, Allocation, Return, SKU, Employee
-from helpers import ok
+from backend.extensions import db
+from backend.models import StockEntry, Allocation, Return, SKU, Employee
+from backend.helpers import ok
 
 reports_bp = Blueprint("reports", __name__)
 

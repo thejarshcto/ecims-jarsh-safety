@@ -3,9 +3,9 @@ ECIMS — Employees Routes
 """
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from extensions import db
-from models import Employee
-from helpers import log_action, ok, err
+from backend.extensions import db
+from backend.models import Employee
+from backend.helpers import log_action, ok, err
 
 employees_bp = Blueprint("employees", __name__)
 

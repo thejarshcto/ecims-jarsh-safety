@@ -1,8 +1,8 @@
 """ECIMS — Audit Logs Routes (read-only for managers, immutable)"""
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from models import AuditLog
-from helpers import ok
+from backend.models import AuditLog
+from backend.helpers import ok
 
 logs_bp = Blueprint("logs", __name__)
 

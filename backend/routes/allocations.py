@@ -6,9 +6,9 @@ POST /api/allocations/<id>/return
 """
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from extensions import db
-from models import Allocation, StockEntry, Return
-from helpers import log_action, ok, err
+from backend.extensions import db
+from backend.models import Allocation, StockEntry, Return
+from backend.helpers import log_action, ok, err
 
 allocations_bp = Blueprint("allocations", __name__)
 

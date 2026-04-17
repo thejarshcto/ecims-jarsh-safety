@@ -2,7 +2,7 @@
 ECIMS — SQLAlchemy Models (PostgreSQL compatible)
 """
 from datetime import datetime
-from extensions import db
+from backend.extensions import db
 
 
 class User(db.Model):

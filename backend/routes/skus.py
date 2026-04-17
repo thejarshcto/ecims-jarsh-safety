@@ -8,9 +8,9 @@ GET    /api/skus/low-stock
 """
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from extensions import db
-from models import SKU
-from helpers import log_action, ok, err
+from backend.extensions import db
+from backend.models import SKU
+from backend.helpers import log_action, ok, err
 import csv, io
 
 skus_bp = Blueprint("skus", __name__)

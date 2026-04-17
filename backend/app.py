@@ -5,17 +5,17 @@ Flask Application — Render + PostgreSQL Deployment
 
 from flask import Flask
 from flask_cors import CORS
-from config import Config
-from extensions import db, jwt
-from routes.auth import auth_bp
-from routes.skus import skus_bp
-from routes.stock import stock_bp
-from routes.allocations import allocations_bp
-from routes.employees import employees_bp
-from routes.projects import projects_bp
-from routes.suppliers import suppliers_bp
-from routes.reports import reports_bp
-from routes.logs import logs_bp
+from backend.config import Config
+from backend.extensions import db, jwt
+from backend.routes.auth import auth_bp
+from backend.routes.skus import skus_bp
+from backend.routes.stock import stock_bp
+from backend.routes.allocations import allocations_bp
+from backend.routes.employees import employees_bp
+from backend.routes.projects import projects_bp
+from backend.routes.suppliers import suppliers_bp
+from backend.routes.reports import reports_bp
+from backend.routes.logs import logs_bp
 import bcrypt
 
 
@@ -53,7 +53,7 @@ def create_app():
 
 def seed_default_data():
     """Insert default admin user and suppliers if not present"""
-    from models import User, Supplier
+    from backend.models import User, Supplier
 
     # Create admin user
     if not User.query.filter_by(username="admin").first():
